@@ -28,7 +28,7 @@ def test_view_class_with_mixin_bad():
 
 def test_view_class_with_mixin():
     class Filter(BaseFilter):
-        foo = Field(field_name='foo', lookup_type='==')
+        foo = Field(field_name="foo", lookup_type="==")
 
         class Meta:
             model = Post
