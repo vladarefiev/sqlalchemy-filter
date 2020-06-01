@@ -31,7 +31,6 @@ class Meta(type):
 
 
 class BaseFilter(metaclass=Meta):
-    _opts = None
     _declared_fields = None
     _lookup_method_map = {
         "==": "__eq__",

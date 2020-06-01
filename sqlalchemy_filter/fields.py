@@ -2,9 +2,21 @@ from datetime import datetime
 from typing import List, Union
 
 
-class Field:
+class IField:
     value = None
 
+    @staticmethod
+    def validate(value, *args, **kwargs):
+        raise NotImplementedError
+
+    def load_value(self, value):
+        raise NotImplementedError
+
+    def get_value(self):
+        raise NotImplementedError
+
+
+class Field(IField):
     def __init__(self, field_name, lookup_type, relation_model=None, **kwargs):
         self.field_name = field_name
         self.lookup_type = lookup_type

@@ -9,7 +9,7 @@ def app():
     app = Flask(__name__)
     app.config[
         "SQLALCHEMY_DATABASE_URI"
-    ] = "postgresql+psycopg2://pylter:password@localhost:5432/pylter"
+    ] = "postgresql+psycopg2://pylter:password@postgres:5432/pylter"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["TESTING"] = True
     return app
