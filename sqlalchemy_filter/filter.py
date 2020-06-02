@@ -16,8 +16,6 @@ class Meta(type):
         fields = []
         for field_name, obj in list(attrs.items()):
             if isinstance(obj, sqlalchemy_filter.fields.Field):
-                if obj.lookup_type not in getattr(cls, "_lookup_method_map", {}):
-                    raise Exception("Not registered lookup type")
                 fields.append(field_name)
 
         cls._declared_fields = fields
@@ -32,23 +30,6 @@ class Meta(type):
 
 class Filter(metaclass=Meta):
     _declared_fields = None
-    _lookup_method_map = {
-        "==": "__eq__",
-        "<": "__lt__",
-        ">": "__gt__",
-        "<=": "__le__",
-        ">=": "__ge__",
-        "!=": "__ne__",
-        "in": "in_",
-        "not_in": "notin_",
-        "like": "like",
-        "ilike": "ilike",
-        "notlike": "notlike",
-        "notilike": "notilike",
-        # jsons operators
-        "#>>": "op",
-        "->>": "op",
-    }
 
     class Meta:
         model = None
@@ -60,6 +41,9 @@ class Filter(metaclass=Meta):
             for relationship in relationships
         }
         return relationships_map.get(name)
+
+    def get_model(self, field_relation_model: str):
+        return self.get_relation_model_by_name(field_relation_model) or self.model
 
     def filter_query(
         self, query: Query, filter_params: Dict[str, Union[List[str], str, bool]]
@@ -73,22 +57,8 @@ class Filter(metaclass=Meta):
 
             field = getattr(self, param)
             field.load_value(value)
-
-            field_relation_model = self.get_relation_model_by_name(field.relation_model)
-            model = field_relation_model or self.model
+            model = self.get_model(field.relation_model)
             column = getattr(model, field.field_name or param)
-            method = self._lookup_method_map[field.lookup_type]
-
-            if isinstance(field, sqlalchemy_filter.fields.JsonField):
-                filter_statement = getattr(column, method)(field.lookup_type)(
-                    field.lookup_path
-                )
-                compare_method = "__ne__" if field.not_equal else "__eq__"
-                filter_expression = getattr(filter_statement, compare_method)(
-                    field.get_value()
-                )
-            else:
-                filter_expression = getattr(column, method)(field.get_value())
-
+            filter_expression = field.get_filter_statement()(column)
             query = query.filter(filter_expression)
         return query
