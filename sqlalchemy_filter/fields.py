@@ -61,9 +61,11 @@ class DateTimeField(Field):
         self.date_format = date_format
 
     @staticmethod
-    def validate(value, date_format, *args, **kwargs):
+    def validate(value, date_format=None, *args, **kwargs):
         if not isinstance(value, (str, datetime)):
-            raise Exception()
+            raise Exception(
+                "DateTimeField and DateField receive only str and datetime objects"
+            )
         return datetime.strptime(value, date_format)
 
     def load_value(self, value: Union[str, datetime]) -> None:

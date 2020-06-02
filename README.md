@@ -1,12 +1,11 @@
 Usage
 -----
 
-sqlalchemy-filter can be used for generating interfaces similar to the `django-filter`
+`sqlalchemy-filter` can be used for generating interfaces similar to the `django-filter`
 library. For example, if you had a Post model you could have a
 filter for it with the code:
 
-.. code-block:: python
-
+```python
     from sqlalchemy_filter import Filter
 
     class PostFilter(Filter):
@@ -20,12 +19,11 @@ filter for it with the code:
     
         class Meta:
             model = Post
-
+```
 
 And then in your view you could do:
 
-.. code-block:: python
-
+```python
     def post_list(request):
         posts = (
             PostFilter()
@@ -33,13 +31,14 @@ And then in your view you could do:
             .all()
         )
         return {"posts": posts}
-        
-Above code will perform query like:
 
+```    
+Above code will perform query like:
+```sql
     SELECT post.id AS post_id, post.title AS post_title, post.pub_date AS post_pub_date, post.is_published AS post_is_published, post.category_id AS post_category_id 
     FROM post JOIN category ON category.id = post.category_id 
     WHERE category.name IN (%(name_1)s)
-    
+```
 Notes:
     You should validate your filter params by yourself and pass already validated params to filter_query func, 
     also you should manually make needed joins like in above example ``Post.query.join(Category)``
@@ -49,7 +48,7 @@ Usage with Flask
 
 Example below contains integration with Flask:
 
-.. code-block:: python
+```python
     
     from flask.views import MethodView
     from sqlalchemy_filter.mixins import FilterSetMixin
@@ -62,3 +61,4 @@ Example below contains integration with Flask:
         filter_params = {...}
         filtered_query = self.filter_query(base_query, filter_params)
         return {"posts": filtered_query.all()}
+```
