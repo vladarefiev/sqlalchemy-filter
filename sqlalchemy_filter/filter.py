@@ -1,4 +1,4 @@
-from typing import Dict, List, Union, Callable
+from typing import Callable, Dict, List, Union
 
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Query
@@ -45,6 +45,9 @@ class Filter(metaclass=Meta):
         "ilike": "ilike",
         "notlike": "notlike",
         "notilike": "notilike",
+        # jsons operators
+        "#>>": "op",
+        "->>": "op",
     }
 
     class Meta:
@@ -76,6 +79,16 @@ class Filter(metaclass=Meta):
             column = getattr(model, field.field_name or param)
             method = self._lookup_method_map[field.lookup_type]
 
-            filter_expression = getattr(column, method)(field.get_value())
+            if isinstance(field, sqlalchemy_filter.fields.JsonField):
+                filter_statement = getattr(column, method)(field.lookup_type)(
+                    field.lookup_path
+                )
+                compare_method = "__ne__" if field.not_equal else "__eq__"
+                filter_expression = getattr(filter_statement, compare_method)(
+                    field.get_value()
+                )
+            else:
+                filter_expression = getattr(column, method)(field.get_value())
+
             query = query.filter(filter_expression)
         return query

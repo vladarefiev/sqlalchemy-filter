@@ -9,6 +9,7 @@ flask-sqlalchemy = "*"
 pytest = "*"
 psycopg2-binary = "*"
 factory-boy = "*"
+isort = "*"
 
 [packages]
 sqlalchemy = "*"

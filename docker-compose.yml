@@ -3,6 +3,8 @@ services:
   tests:
     build:
       context: .
+    env_file:
+      - .env
     volumes:
       - '.:/app'
 
@@ -10,9 +12,5 @@ services:
     image: "postgres"
     ports:
       - 5432:5432
-    environment:
-      - POSTGRES_USER=pylter
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=pylter
-    depends_on:
-      - tests
+    env_file:
+      - .env
