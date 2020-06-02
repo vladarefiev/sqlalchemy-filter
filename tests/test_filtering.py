@@ -60,10 +60,10 @@ def test_filter_category(database):
     category_2 = factories.Category.create(name="2")
     post = factories.Post.create(title="1", category=category_1)
     factories.Post.create(title="2", category=category_2)
-    query = (
-        PostFilter()
-        .filter_query(Post.query.join(Category), {"category": category_1.name})
-        .all()
+    query = PostFilter().filter_query(
+        Post.query.join(Category), {"category": category_1.name}
     )
+    print("query", query)
+    query = query.all()
     assert len(query) == 1
     assert query[0].id == post.id
