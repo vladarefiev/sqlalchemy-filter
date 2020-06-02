@@ -8,6 +8,7 @@ black = "==19.10b0"
 flask-sqlalchemy = "*"
 pytest = "*"
 psycopg2-binary = "*"
+factory-boy = "*"
 
 [packages]
 sqlalchemy = "*"

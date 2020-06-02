@@ -17,7 +17,7 @@ class Meta(type):
         for field_name, obj in list(attrs.items()):
             if isinstance(obj, Field):
                 if obj.lookup_type not in getattr(cls, "_lookup_method_map", {}):
-                    raise Exception("not registered lookup type")
+                    raise Exception("Not registered lookup type")
                 fields.append(field_name)
 
         cls._declared_fields = fields
@@ -25,12 +25,12 @@ class Meta(type):
         return cls
 
     def __call__(cls, *args, **kwargs):
-        if cls.__name__ == "BaseFilter":
-            raise TypeError("Abstract class BaseFilter cannot be instantiated")
+        if cls.__name__ == "Filter":
+            raise TypeError("Abstract class Filter cannot be instantiated")
         return super().__call__(*args, **kwargs)
 
 
-class BaseFilter(metaclass=Meta):
+class Filter(metaclass=Meta):
     _declared_fields = None
     _lookup_method_map = {
         "==": "__eq__",
@@ -43,6 +43,8 @@ class BaseFilter(metaclass=Meta):
         "not_in": "notin_",
         "like": "like",
         "ilike": "ilike",
+        "notlike": "notlike",
+        "notilike": "notilike",
     }
 
     class Meta:
@@ -77,17 +79,3 @@ class BaseFilter(metaclass=Meta):
             filter_expression = getattr(column, method)(field.get_value())
             query = query.filter(filter_expression)
         return query
-
-
-class FilterSetMixin:
-    filter_class = None
-
-    def filter_query(self, query, filter_params):
-        if not hasattr(self, "filter_class") or self.filter_class is None:
-            raise Exception("Should be declared filter_class for using FilterSetMixin")
-
-        filter_ = self.filter_class()
-        if not hasattr(filter_, "filter_query"):
-            raise Exception("unknown filter_class")
-
-        return filter_.filter_query(query, filter_params)
