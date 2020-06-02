@@ -1,12 +1,9 @@
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Callable
 
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Query
 
 import sqlalchemy_filter.fields
-
-
-__all__ = ["Filter"]
 
 
 class Meta(type):
@@ -53,7 +50,7 @@ class Filter(metaclass=Meta):
     class Meta:
         model = None
 
-    def get_relation_model_by_name(self, name: str):
+    def get_relation_model_by_name(self, name: str) -> Dict[str, Callable]:
         relationships = inspect(self.model).relationships
         relationships_map = {
             relationship.mapper.class_.__name__: relationship.mapper.class_
@@ -76,7 +73,7 @@ class Filter(metaclass=Meta):
 
             field_relation_model = self.get_relation_model_by_name(field.relation_model)
             model = field_relation_model or self.model
-            column = getattr(model, field.field_name)
+            column = getattr(model, field.field_name or param)
             method = self._lookup_method_map[field.lookup_type]
 
             filter_expression = getattr(column, method)(field.get_value())

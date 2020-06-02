@@ -10,3 +10,7 @@ verify:
 	docker-compose run tests black --check --diff .
 	docker-compose run tests pytest -vv
 	docker-compose down
+
+publish:
+	python setup.py sdist
+	twine upload dist/*

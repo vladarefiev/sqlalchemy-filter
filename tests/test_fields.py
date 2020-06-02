@@ -56,6 +56,12 @@ def test_date_field(input_data, date_format, expected, error_class):
             None,
         ),
         (
+            datetime(year=2020, month=1, day=1, hour=13, minute=22, second=5),
+            "%Y-%m-%d %H:%M:%S",
+            datetime(year=2020, month=1, day=1, hour=13, minute=22, second=5),
+            None,
+        ),
+        (
             "2020-01-01 1:22:05PM",
             "%Y-%m-%d %H:%M:%S",
             datetime(year=2020, month=1, day=1, hour=13, minute=22, second=5),
@@ -63,6 +69,12 @@ def test_date_field(input_data, date_format, expected, error_class):
         ),
         (
             "Jun 1 2020  1:33PM",
+            "%b %d %Y %I:%M%p",
+            datetime(year=2020, month=6, day=1, hour=13, minute=33),
+            None,
+        ),
+        (
+            datetime(year=2020, month=6, day=1, hour=13, minute=33),
             "%b %d %Y %I:%M%p",
             datetime(year=2020, month=6, day=1, hour=13, minute=33),
             None,
@@ -83,8 +95,5 @@ def test_datetime_field(input_data, date_format, expected, error_class):
         with pytest.raises(error_class):
             field.load_value(input_data)
     else:
-        field = fields.DateField(
-            field_name="foo", date_format=date_format, lookup_type=">"
-        )
         field.load_value(input_data)
         assert field.get_value() == expected

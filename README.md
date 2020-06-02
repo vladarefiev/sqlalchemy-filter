@@ -11,10 +11,10 @@ filter for it with the code:
     class PostFilter(Filter):
         from_date = Field(field_name="pub_date", lookup_type=">=")
         to_date = Field(field_name="pub_date", lookup_type="<=")
-        is_published = BooleanField(field_name="is_published")
-        title = Field(field_name="title", lookup_type="==")
-        title_like = Field(field_name="title", lookup_type="like")
-        title_ilike = Field(field_name="title", lookup_type="ilike")
+        is_published = BooleanField()
+        title = Field(lookup_type="==")
+        title_like = Field(lookup_type="like")
+        title_ilike = Field(lookup_type="ilike")
         category = Field(relation_model="Category", field_name="name", lookup_type="in")
     
         class Meta:

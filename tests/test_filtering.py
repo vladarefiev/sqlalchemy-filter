@@ -8,10 +8,10 @@ from tests import factories, models
 class PostFilter(filter.Filter):
     from_date = fields.Field(field_name="pub_date", lookup_type=">=")
     to_date = fields.Field(field_name="pub_date", lookup_type="<=")
-    is_published = fields.BooleanField(field_name="is_published")
-    title = fields.Field(field_name="title", lookup_type="==")
-    title_like = fields.Field(field_name="title", lookup_type="like")
-    title_ilike = fields.Field(field_name="title", lookup_type="ilike")
+    is_published = fields.BooleanField()
+    title = fields.Field(lookup_type="==")
+    title_like = fields.Field(lookup_type="like")
+    title_ilike = fields.Field(lookup_type="ilike")
     category = fields.Field(
         relation_model="Category", field_name="name", lookup_type="in"
     )
@@ -20,11 +20,14 @@ class PostFilter(filter.Filter):
         model = models.Post
 
 
-def test_filter_from_date(database):
+@pytest.mark.parametrize(
+    "to_date_param", [(date(year=2020, month=1, day=2),), ("2020-01-02",)]
+)
+def test_filter_from_date(database, to_date_param):
     factories.Post.create(pub_date=datetime(year=2020, month=1, day=1))
     post = factories.Post.create(pub_date=datetime(year=2020, month=1, day=2))
     query = (
-        PostFilter().filter_query(models.Post.query, {"from_date": "2020-01-02"}).all()
+        PostFilter().filter_query(models.Post.query, {"from_date": to_date_param}).all()
     )
     assert len(query) == 1
     assert query[0].id == post.id
@@ -67,7 +70,6 @@ def test_filter_category(database):
     query = PostFilter().filter_query(
         models.Post.query.join(models.Category), {"category": category_1.name}
     )
-    print("query", query)
     query = query.all()
     assert len(query) == 1
     assert query[0].id == post.id
