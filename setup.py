@@ -25,6 +25,7 @@ setup(
         "sqlalchemy-filter is a helper library to perform filtering over sqlalchemy queries"
     ),
     long_description=readme,
+    long_description_content_type="text/markdown",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
