@@ -3,7 +3,10 @@ from typing import Dict, List, Union
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Query
 
-from .fields import Field
+import sqlalchemy_filter.fields
+
+
+__all__ = ["Filter"]
 
 
 class Meta(type):
@@ -15,7 +18,7 @@ class Meta(type):
         cls = super().__new__(mcs, name, bases, attrs)
         fields = []
         for field_name, obj in list(attrs.items()):
-            if isinstance(obj, Field):
+            if isinstance(obj, sqlalchemy_filter.fields.Field):
                 if obj.lookup_type not in getattr(cls, "_lookup_method_map", {}):
                     raise Exception("Not registered lookup type")
                 fields.append(field_name)

@@ -1,3 +1,6 @@
+__all__ = ["FilterSetMixin"]
+
+
 class FilterSetMixin:
     filter_class = None
 

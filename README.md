@@ -56,9 +56,9 @@ Example below contains integration with Flask:
     class PostAPI(MethodView, FilterSetMixin):
         filter_class = PostFilter
 
-    def get(self, *args, **kwargs):
-        base_query = Post.query
-        filter_params = {...}
-        filtered_query = self.filter_query(base_query, filter_params)
-        return {"posts": filtered_query.all()}
+        def get(self, *args, **kwargs):
+            base_query = Post.query
+            filter_params = {...}
+            filtered_query = self.filter_query(base_query, filter_params)
+            return {"posts": filtered_query.all()}
 ```
