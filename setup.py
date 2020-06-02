@@ -3,7 +3,6 @@ import re
 
 from setuptools import find_packages, setup
 
-
 path = os.path.abspath(os.path.dirname(__file__))
 
 with open(os.path.join(path, "sqlalchemy_filter", "__init__.py"), encoding="utf8") as f:

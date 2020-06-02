@@ -6,7 +6,7 @@ from sqlalchemy_filter import fields
 
 
 @pytest.mark.parametrize(
-    "input_data,expected",
+    "input_data, expected",
     [
         (True, True),
         ("True", True),
@@ -25,7 +25,7 @@ def test_boolean_field(input_data, expected):
 
 
 @pytest.mark.parametrize(
-    "input_data,date_format,expected,error_class",
+    "input_data, date_format, expected, error_class",
     [
         ("2020-01-01", "%Y-%m-%d", datetime(year=2020, month=1, day=1), None),
         ("2020-10-01", "%Y-%d-%m", datetime(year=2020, month=1, day=10), None),
@@ -47,7 +47,7 @@ def test_date_field(input_data, date_format, expected, error_class):
 
 
 @pytest.mark.parametrize(
-    "input_data,date_format,expected,error_class",
+    "input_data, date_format, expected, error_class",
     [
         (
             "2020-01-01 13:22:05",

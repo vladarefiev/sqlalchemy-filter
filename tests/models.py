@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from sqlalchemy.dialects.postgresql import JSONB
+
 from tests import db
 
 
@@ -10,6 +12,7 @@ class Post(db.Model):
     is_published = db.Column(db.Boolean, nullable=False, default=True)
     category_id = db.Column(db.Integer, db.ForeignKey("category.id"))
     category = db.relationship("Category", backref=db.backref("posts", lazy=True))
+    data = db.Column(JSONB)
 
     def __repr__(self):
         return f"{self.title}, {self.pub_date}"

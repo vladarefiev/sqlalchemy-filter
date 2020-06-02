@@ -1,8 +1,8 @@
 import pytest
-
-from sqlalchemy_filter import filter, fields, mixins
-from tests.models import Post
 from sqlalchemy.orm import Query
+
+from sqlalchemy_filter import fields, filter, mixins
+from tests.models import Post
 
 
 def test_view_class_with_mixin_bad():

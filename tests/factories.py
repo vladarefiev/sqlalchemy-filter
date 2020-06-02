@@ -1,6 +1,6 @@
 import factory
 
-from tests import models, db
+from tests import db, models
 
 
 class Category(factory.alchemy.SQLAlchemyModelFactory):

@@ -1,6 +1,5 @@
 from datetime import datetime
-from typing import Union, Optional, Any
-
+from typing import Any, Optional, Union
 
 __all__ = ["Field", "BooleanField", "DateTimeField", "DateField"]
 
@@ -79,6 +78,15 @@ class DateTimeField(Field):
 
     def load_value(self, value: Union[str, datetime]) -> None:
         self.value = self.validate(value, date_format=self.date_format)
+
+
+class JsonField(Field):
+    def __init__(
+        self, lookup_path: Optional[str] = None, not_equal=False, *args, **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+        self.lookup_path = lookup_path
+        self.not_equal = not_equal
 
 
 DateField = DateTimeField

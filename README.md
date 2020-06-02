@@ -15,6 +15,7 @@ filter for it with the code:
         title = Field(lookup_type="==")
         title_like = Field(lookup_type="like")
         title_ilike = Field(lookup_type="ilike")
+        data = fields.JsonField(lookup_type="#>>", lookup_path="{foo,0}", not_equal=True)
         category = Field(relation_model="Category", field_name="name", lookup_type="in")
     
         class Meta:

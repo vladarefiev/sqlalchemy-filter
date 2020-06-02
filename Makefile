@@ -3,6 +3,7 @@ clean:
 	find . -name '__pycache__' -delete
 
 fmt:
+	isort -rc .
 	black .
 
 verify:
