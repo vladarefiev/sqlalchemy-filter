@@ -100,7 +100,7 @@ PostFilter().filter_query(models.Post.query, {"not_title": "Title 1"}).all()
 ```sql
 SELECT *
 FROM post 
-WHERE (post.data ->> 'title' != 'Title 1'
+WHERE (post.data ->> 'title') != 'Title 1'
 ```
 
 Find posts where is_published == True
@@ -112,7 +112,7 @@ PostFilter().filter_query(models.Post.query, {"is_published": "true"}).all()
 ```sql
 SELECT *
 FROM post 
-WHERE (post.data ->> "is_published" = "true"
+WHERE (post.data ->> "is_published") = "true"
 ```
 
 Find posts where first tag name == IT
@@ -124,7 +124,7 @@ PostFilter().filter_query(models.Post.query, {"tag": 'IT'}).all()
 ```sql
 SELECT *
 FROM post 
-WHERE (post.data #>> '{tags, 0, name}' = 'IT'
+WHERE (post.data #>> '{tags, 0, name}') = 'IT'
 ```
 
 Usage with Flask
