@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Any, Optional, Union
 
+import sqlalchemy_filter.exceptions
+
 __all__ = ["Field", "BooleanField", "DateTimeField", "DateField"]
 
 
@@ -12,10 +14,7 @@ class IField:
     def validate(value, *args, **kwargs):
         raise NotImplementedError
 
-    def load_value(self, value):
-        raise NotImplementedError
-
-    def get_value(self):
+    def get_filter_statement(self):
         raise NotImplementedError
 
 
@@ -43,24 +42,28 @@ class Field(IField):
         **kwargs
     ):
         if lookup_type not in self._lookup_method_map:
-            raise Exception("Not registered lookup type")
+            raise sqlalchemy_filter.exceptions.LookTypeException(
+                "Not registered lookup type"
+            )
 
         self.field_name = field_name
         self.lookup_type = lookup_type
         self.relation_model = relation_model
 
-    @staticmethod
-    def validate(value, *args, **kwargs):
-        return value
+    @property
+    def value(self) -> Any:
+        return self._value
 
-    def load_value(self, value: str):
+    @value.setter
+    def value(self, value: str) -> None:
         self._value = self.validate(value)
         self._value = (
             value.split(",") if self.lookup_type in ["in", "not_in",] else value
         )
 
-    def get_value(self) -> Any:
-        return self._value
+    @staticmethod
+    def validate(value, *args, **kwargs):
+        return value
 
     def get_filter_statement(self):
         method = self._lookup_method_map[self.lookup_type]
@@ -78,14 +81,26 @@ class BooleanField(Field):
     @staticmethod
     def validate(value: Union[bool, str], *args, **kwargs):
         if not isinstance(value, (bool, str,)):
-            raise Exception("BooleanField expects bool or str")
+            raise sqlalchemy_filter.exceptions.FieldException(
+                "BooleanField expects bool or str"
+            )
         return value if isinstance(value, bool) else value.lower() in ["true", "1"]
 
-    def load_value(self, value: Union[bool, str]) -> None:
+    @Field.value.setter
+    def value(self, value: Union[bool, str]) -> None:
         self._value = self.validate(value)
 
 
 class DateTimeField(Field):
+    _lookup_method_map = {
+        "==": "__eq__",
+        "<": "__lt__",
+        ">": "__gt__",
+        "<=": "__le__",
+        ">=": "__ge__",
+        "!=": "__ne__",
+    }
+
     def __init__(self, date_format="%Y-%m-%d", **kwargs):
         super().__init__(**kwargs)
         self.date_format = date_format
@@ -95,7 +110,7 @@ class DateTimeField(Field):
         value: Union[str, datetime], date_format=None, *args, **kwargs
     ) -> datetime:
         if not isinstance(value, (str, datetime)):
-            raise Exception(
+            raise sqlalchemy_filter.exceptions.FieldException(
                 "DateTimeField and DateField receive only str and datetime objects"
             )
 
@@ -103,7 +118,8 @@ class DateTimeField(Field):
             datetime.strptime(value, date_format) if isinstance(value, str) else value
         )
 
-    def load_value(self, value: Union[str, datetime]) -> None:
+    @Field.value.setter
+    def value(self, value: Union[str, datetime]) -> None:
         self._value = self.validate(value, date_format=self.date_format)
 
 
@@ -114,9 +130,14 @@ class JsonField(Field):
     }
 
     def __init__(
-        self, lookup_path: Optional[str] = None, not_equal=False, *args, **kwargs
+        self,
+        lookup_type: str = None,
+        lookup_path: Optional[str] = None,
+        not_equal=False,
+        *args,
+        **kwargs
     ):
-        super().__init__(*args, **kwargs)
+        super().__init__(lookup_type, *args, **kwargs)
         self.lookup_path = lookup_path
         self.not_equal = not_equal
 

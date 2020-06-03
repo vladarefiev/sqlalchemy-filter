@@ -5,12 +5,8 @@ import sqlalchemy_filter.mixins
 __version__ = "0.1.0"
 
 
-__all__ = ["Filter", "DateField", "DateTimeField", "BooleanField", "Field"]
+__all__ = ["Filter", "fields"]
 
 
-DateField = sqlalchemy_filter.fields.DateField
-DateTimeField = sqlalchemy_filter.fields.DateTimeField
-BooleanField = sqlalchemy_filter.fields.BooleanField
-Field = sqlalchemy_filter.fields.Field
-
+fields = sqlalchemy_filter.fields
 Filter = sqlalchemy_filter.filter.Filter

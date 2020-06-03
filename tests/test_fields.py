@@ -20,8 +20,8 @@ from sqlalchemy_filter import fields
 )
 def test_boolean_field(input_data, expected):
     field = fields.BooleanField(field_name="foo")
-    field.load_value(input_data)
-    assert field.get_value() is expected
+    field.value = input_data
+    assert field.value is expected
 
 
 @pytest.mark.parametrize(
@@ -37,13 +37,13 @@ def test_date_field(input_data, date_format, expected, error_class):
     field = fields.DateField(field_name="foo", date_format=date_format, lookup_type=">")
     if error_class:
         with pytest.raises(error_class):
-            field.load_value(input_data)
+            field.value = input_data
     else:
         field = fields.DateField(
             field_name="foo", date_format=date_format, lookup_type=">"
         )
-        field.load_value(input_data)
-        assert field.get_value() == expected
+        field.value = input_data
+        assert field.value == expected
 
 
 @pytest.mark.parametrize(
@@ -93,7 +93,7 @@ def test_datetime_field(input_data, date_format, expected, error_class):
     )
     if error_class:
         with pytest.raises(error_class):
-            field.load_value(input_data)
+            field.value = input_data
     else:
-        field.load_value(input_data)
-        assert field.get_value() == expected
+        field.value = input_data
+        assert field.value == expected

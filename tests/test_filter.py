@@ -1,16 +1,16 @@
 import pytest
 
-from sqlalchemy_filter import fields, filter
+from sqlalchemy_filter import exceptions, fields, filter
 from tests import models
 
 
 def test_base_filter_class():
-    with pytest.raises(TypeError):
+    with pytest.raises(exceptions.FilterException):
         filter.Filter()
 
 
 def test_filter_class_without_meta_model():
-    with pytest.raises(Exception):
+    with pytest.raises(exceptions.FilterException):
         type(
             "TestFilter",
             (filter.Filter,),
