@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 
 from sqlalchemy_filter import exceptions, fields, filter
@@ -18,10 +20,16 @@ def test_filter_class_without_meta_model():
         )
 
 
-def test_filter_class_with_meta_model():
+@pytest.mark.parametrize(
+    "param, called", [("title", True), ("id", False), ("foo", False)],
+)
+def test_filter_class_with_meta_model(param, called):
     meta = type("Meta", (), {"model": models.Post})
-    type(
+    filter_ = type(
         "TestFilter",
         (filter.Filter,),
-        {"foo": fields.Field(field_name="foo", lookup_type="=="), "Meta": meta},
-    )
+        {"title": fields.Field(lookup_type="=="), "Meta": meta},
+    )()
+    query = mock.Mock()
+    filter_.filter_query(query, {param: "some_value"})
+    query.filter.assert_called_once() if called else query.filter.assert_not_called()

@@ -10,6 +10,8 @@ pytest = "*"
 psycopg2-binary = "*"
 factory-boy = "*"
 isort = "*"
+pytest-cov = "*"
+codecov = "*"
 
 [packages]
 sqlalchemy = "*"
