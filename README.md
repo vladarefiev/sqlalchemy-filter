@@ -10,8 +10,8 @@ from sqlalchemy_filter import Filter, fields
 from app import models
 
 class PostFilter(Filter):
-    from_date = fields.Field(field_name="pub_date", lookup_type=">=")
-    to_date = fields.Field(field_name="pub_date", lookup_type="<=")
+    from_date = fields.DateField(field_name="pub_date", lookup_type=">=")
+    to_date = fields.DateField(field_name="pub_date", lookup_type="<=")
     is_published = fields.BooleanField()
     title = fields.Field(lookup_type="==")
     title_like = fields.Field(lookup_type="like")
