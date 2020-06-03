@@ -3,6 +3,7 @@ from typing import Callable, Dict, List, Union
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Query
 
+import sqlalchemy_filter.exceptions
 import sqlalchemy_filter.fields
 
 
@@ -10,7 +11,9 @@ class Meta(type):
     def __new__(mcs, name: str, bases: tuple, attrs: dict):
         meta = attrs.get("Meta")
         if not hasattr(meta, "model"):
-            raise Exception("Meta model is not defined")
+            raise sqlalchemy_filter.exceptions.FilterException(
+                "Meta model is not defined"
+            )
 
         cls = super().__new__(mcs, name, bases, attrs)
         fields = []
@@ -24,7 +27,9 @@ class Meta(type):
 
     def __call__(cls, *args, **kwargs):
         if cls.__name__ == "Filter":
-            raise TypeError("Abstract class Filter cannot be instantiated")
+            raise sqlalchemy_filter.exceptions.FilterException(
+                "Abstract class Filter cannot be instantiated"
+            )
         return super().__call__(*args, **kwargs)
 
 
@@ -56,7 +61,7 @@ class Filter(metaclass=Meta):
                 continue
 
             field = getattr(self, param)
-            field.load_value(value)
+            field.value = value
             model = self.get_model(field.relation_model)
             column = getattr(model, field.field_name or param)
             filter_expression = field.get_filter_statement()(column)

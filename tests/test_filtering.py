@@ -82,13 +82,16 @@ def test_filter_category(database):
 @pytest.mark.parametrize(
     "lookup_type, lookup_path, param, not_equal, expected_id",
     [
-        ("->>", "field_1", "1", False, 1),
-        ("->>", "field_1", "5", False, 2),
-        ("#>>", "{field_1}", "5", False, 2),
-        ("#>>", "{field_3, field_2}", "2", False, 1),
-        ("#>>", "{field_3, field_2}", "2", True, 2),
-        ("#>>", "{field_3, field_3, field_1}", "1", False, 1),
-        ("#>>", "{field_2, 0}", "1", False, 2),
+        ("->>", "id", "1", False, 1),
+        ("->>", "id", "1", True, 2),
+        ("->>", "id", "5", False, 2),
+        ("->>", "is_published", "true", False, 1),
+        ("#>>", "{id}", "5", False, 2),
+        ("#>>", "{tags, id}", "2", False, 1),
+        ("#>>", "{tags, id}", "2", True, 2),
+        ("#>>", "{tags, extra, id}", "1", False, 1),
+        ("#>>", "{category_id, 0}", "1", False, 2),
+        ("#>>", "{labels, 0, name}", "IT", False, 1),
     ],
 )
 def test_filter_jsonb(
@@ -108,25 +111,20 @@ def test_filter_jsonb(
     factories.Post.create(
         id=1,
         data={
-            "field_1": 1,
-            "field_2": 2,
-            "field_3": {
-                "field_1": 1,
-                "field_2": 2,
-                "field_3": {"field_1": 1, "field_2": 2},
-            },
+            "id": 1,
+            "category_id": 2,
+            "tags": {"id": 2, "extra": {"id": 1, "name": "foo"}},
+            "is_published": True,
+            "labels": [{"name": "IT"}, {"name": "Biology"}],
         },
     )
     factories.Post.create(
         id=2,
         data={
-            "field_1": 5,
-            "field_2": [1, 2, 3],
-            "field_3": {
-                "field_1": 5,
-                "field_2": 6,
-                "field_3": {"field_1": 5, "field_2": 6},
-            },
+            "id": 5,
+            "category_id": [1, 2, 3],
+            "tags": {"id": 6, "extra": {"id": 5, "name": "foo"}},
+            "is_published": False,
         },
     )
     result = json_filter.filter_query(models.Post.query, {"data": param}).all()
