@@ -16,7 +16,7 @@ build:
 	docker-compose up -d --build
 	docker-compose run tests black --check --diff .
 	docker-compose run tests pytest -vv --cov-report xml --cov=sqlalchemy_filter tests/
-	docker-compose run tests codecov -t c1131812-1766-49bf-9a4e-528bfca56625
+	docker-compose run tests codecov -t a005bdf5-4ab0-4b2a-91c8-8a99ad254d00
 	docker-compose down
 
 publish:
