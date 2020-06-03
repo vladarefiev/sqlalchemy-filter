@@ -16,12 +16,6 @@ class Meta(type):
             )
 
         cls = super().__new__(mcs, name, bases, attrs)
-        fields = []
-        for field_name, obj in list(attrs.items()):
-            if isinstance(obj, sqlalchemy_filter.fields.Field):
-                fields.append(field_name)
-
-        cls._declared_fields = fields
         cls.model = meta.model
         return cls
 
@@ -34,8 +28,6 @@ class Meta(type):
 
 
 class Filter(metaclass=Meta):
-    _declared_fields = None
-
     class Meta:
         model = None
 
@@ -55,9 +47,6 @@ class Filter(metaclass=Meta):
     ) -> Query:
         for param, value in filter_params.items():
             if not hasattr(self, param):
-                continue
-
-            if param not in self._declared_fields:
                 continue
 
             field = getattr(self, param)

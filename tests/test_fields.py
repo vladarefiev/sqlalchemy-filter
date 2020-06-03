@@ -2,7 +2,12 @@ from datetime import datetime
 
 import pytest
 
-from sqlalchemy_filter import fields
+from sqlalchemy_filter import exceptions, fields
+
+
+def test_field_with_unknown_lookup_type():
+    with pytest.raises(exceptions.LookTypeException):
+        fields.Field(lookup_type="foo")
 
 
 @pytest.mark.parametrize(
@@ -22,6 +27,12 @@ def test_boolean_field(input_data, expected):
     field = fields.BooleanField(field_name="foo")
     field.value = input_data
     assert field.value is expected
+
+
+def test_boolean_field_with_bad_value():
+    with pytest.raises(exceptions.FieldException):
+        field = fields.BooleanField(field_name="foo")
+        field.value = 1
 
 
 @pytest.mark.parametrize(
@@ -44,6 +55,12 @@ def test_date_field(input_data, date_format, expected, error_class):
         )
         field.value = input_data
         assert field.value == expected
+
+
+def test_datetime_field_with_bad_value():
+    with pytest.raises(exceptions.FieldException):
+        field = fields.DateTimeField(field_name="foo", lookup_type="==")
+        field.value = 1
 
 
 @pytest.mark.parametrize(

@@ -1,21 +1,24 @@
+import abc
 from datetime import datetime
 from typing import Any, Optional, Union
 
 import sqlalchemy_filter.exceptions
 
-__all__ = ["Field", "BooleanField", "DateTimeField", "DateField"]
+__all__ = ["Field", "BooleanField", "DateTimeField", "DateField", "JsonField"]
 
 
-class IField:
+class IField(metaclass=abc.ABCMeta):
     _value = None
     _lookup_method_map = None
 
     @staticmethod
+    @abc.abstractmethod
     def validate(value, *args, **kwargs):
-        raise NotImplementedError
+        pass
 
+    @abc.abstractmethod
     def get_filter_statement(self):
-        raise NotImplementedError
+        pass
 
 
 class Field(IField):
