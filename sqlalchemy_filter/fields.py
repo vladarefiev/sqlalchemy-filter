@@ -14,11 +14,11 @@ class IField(metaclass=abc.ABCMeta):
     @staticmethod
     @abc.abstractmethod
     def validate(value, *args, **kwargs):
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def get_filter_statement(self):
-        pass
+        raise NotImplementedError
 
 
 class Field(IField):
