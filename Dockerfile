@@ -4,7 +4,7 @@ WORKDIR /app
 COPY . /app
 
 RUN apk update \
-    && apk add postgresql-dev gcc python3-dev musl-dev \
+    && apk add postgresql-dev gcc python3-dev musl-dev git\
     && rm -rf /var/cache/apk/*
 
 RUN pip install --upgrade pip setuptools \
