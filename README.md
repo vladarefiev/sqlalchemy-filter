@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/vladarefiev/sqlalchemy-filter/branch/master/graph/badge.svg)](https://codecov.io/gh/vladarefiev/sqlalchemy-filter)
+
 Usage
 -----
 
