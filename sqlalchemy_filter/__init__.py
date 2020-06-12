@@ -3,7 +3,7 @@ import sqlalchemy_filter.fields
 import sqlalchemy_filter.filter
 import sqlalchemy_filter.mixins
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 
 __all__ = ["Filter", "fields", "exceptions"]

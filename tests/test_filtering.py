@@ -16,6 +16,7 @@ class PostFilter(filter.Filter):
     category = fields.Field(
         relation_model="Category", field_name="name", lookup_type="in"
     )
+    order = fields.OrderField()
 
     class Meta:
         model = models.Post
@@ -130,3 +131,13 @@ def test_filter_jsonb(
     result = json_filter.filter_query(models.Post.query, {"data": param}).all()
     assert len(result) == 1
     assert result[0].id == expected_id
+
+
+def test_ordering(database):
+    factories.Post.create(id=1, title="Title 1")
+    factories.Post.create(id=2, title="Title 1")
+    factories.Post.create(id=3, title="Title 3")
+    result = PostFilter().filter_query(models.Post.query, {"order": "title,-id"})
+    assert result[0].id == 2
+    assert result[1].id == 1
+    assert result[2].id == 3
