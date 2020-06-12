@@ -1,4 +1,4 @@
-from typing import Callable, Dict, List, Union
+from typing import Callable, Dict, List, Type, Union
 
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Query
@@ -8,7 +8,7 @@ import sqlalchemy_filter.fields
 
 
 class Meta(type):
-    def __new__(mcs, name: str, bases: tuple, attrs: dict):
+    def __new__(mcs, name: str, bases: tuple, attrs: dict) -> "Callable":
         meta = attrs.get("Meta")
         if not hasattr(meta, "model"):
             raise sqlalchemy_filter.exceptions.FilterException(
@@ -19,7 +19,7 @@ class Meta(type):
         cls.model = meta.model
         return cls
 
-    def __call__(cls, *args, **kwargs):
+    def __call__(cls, *args, **kwargs) -> Type["Filter"]:
         if cls.__name__ == "Filter":
             raise sqlalchemy_filter.exceptions.FilterException(
                 "Abstract class Filter cannot be instantiated"
@@ -52,7 +52,11 @@ class Filter(metaclass=Meta):
             field = getattr(self, param)
             field.value = value
             model = self.get_model(field.relation_model)
-            column = getattr(model, field.field_name or param)
-            filter_expression = field.get_filter_statement()(column)
-            query = query.filter(filter_expression)
+            if param == "order":
+                order_expression = field.get_expression()(model)
+                query = query.order_by(*order_expression)
+            else:
+                column = getattr(model, field.field_name or param)
+                filter_expression = field.get_expression()(column)
+                query = query.filter(filter_expression)
         return query

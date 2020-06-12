@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 import pytest
 
@@ -41,6 +41,13 @@ def test_boolean_field_with_bad_value():
         ("2020-01-01", "%Y-%m-%d", datetime(year=2020, month=1, day=1), None),
         ("2020-10-01", "%Y-%d-%m", datetime(year=2020, month=1, day=10), None),
         ("Jun 1 2020", "%b %d %Y", datetime(year=2020, month=6, day=1), None),
+        (
+            datetime(year=2020, month=6, day=1),
+            None,
+            datetime(year=2020, month=6, day=1),
+            None,
+        ),
+        (date(year=2020, month=6, day=1), None, date(year=2020, month=6, day=1), None,),
         ("Jun 1 2020", "%Y %d %m", datetime(year=2020, month=6, day=1), ValueError),
     ],
 )
@@ -114,3 +121,17 @@ def test_datetime_field(input_data, date_format, expected, error_class):
     else:
         field.value = input_data
         assert field.value == expected
+
+
+@pytest.mark.parametrize(
+    "input_data, expected",
+    [
+        ("-foo,bar", {"foo": "desc", "bar": "asc"}),
+        ("foo, bar", {"foo": "asc", "bar": "asc"}),
+        ("-foo,-bar", {"foo": "desc", "bar": "desc"}),
+    ],
+)
+def test_order_field(input_data, expected):
+    field = fields.OrderField()
+    field.value = input_data
+    assert field.value == expected

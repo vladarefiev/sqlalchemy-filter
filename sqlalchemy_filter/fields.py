@@ -1,6 +1,6 @@
 import abc
-from datetime import datetime
-from typing import Any, Optional, Union
+from datetime import date, datetime
+from typing import Any, Dict, List, Optional, Union
 
 import sqlalchemy_filter.exceptions
 
@@ -10,6 +10,7 @@ __all__ = ["Field", "BooleanField", "DateTimeField", "DateField", "JsonField"]
 class IField(metaclass=abc.ABCMeta):
     _value = None
     _lookup_method_map = None
+    relation_model = None
 
     @staticmethod
     @abc.abstractmethod
@@ -17,7 +18,7 @@ class IField(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_filter_statement(self):
+    def get_expression(self):
         raise NotImplementedError
 
 
@@ -61,14 +62,14 @@ class Field(IField):
     def value(self, value: str) -> None:
         self._value = self.validate(value)
         self._value = (
-            value.split(",") if self.lookup_type in ["in", "not_in",] else value
+            value.split(",") if self.lookup_type in ["in", "not_in"] else value
         )
 
     @staticmethod
     def validate(value, *args, **kwargs):
         return value
 
-    def get_filter_statement(self):
+    def get_expression(self):
         method = self._lookup_method_map[self.lookup_type]
 
         def expression(column):
@@ -112,7 +113,7 @@ class DateTimeField(Field):
     def validate(
         value: Union[str, datetime], date_format=None, *args, **kwargs
     ) -> datetime:
-        if not isinstance(value, (str, datetime)):
+        if not isinstance(value, (str, datetime, date)):
             raise sqlalchemy_filter.exceptions.FieldException(
                 "DateTimeField and DateField receive only str and datetime objects"
             )
@@ -144,7 +145,7 @@ class JsonField(Field):
         self.lookup_path = lookup_path
         self.not_equal = not_equal
 
-    def get_filter_statement(self):
+    def get_expression(self):
         method = self._lookup_method_map[self.lookup_type]
 
         def expression(column):
@@ -153,6 +154,43 @@ class JsonField(Field):
             )
             compare_method = "__ne__" if self.not_equal else "__eq__"
             return getattr(filter_statement, compare_method)(self._value)
+
+        return expression
+
+
+class OrderField(IField):
+    @property
+    def value(self) -> Dict[str, str]:
+        return self._value
+
+    @staticmethod
+    def validate(value: str, *args, **kwargs) -> List[str]:
+        if not isinstance(value, str):
+            raise sqlalchemy_filter.exceptions.FieldException(
+                "OrderField expects str value"
+            )
+        return [i.strip() for i in value.split(",")]
+
+    @value.setter
+    def value(self, value: str):
+        value = self.validate(value)
+        result = {}
+        for field in value:
+            order = "asc"
+            if field.startswith("-"):
+                field = field[1:]
+                order = "desc"
+            result[field] = order
+
+        self._value = result
+
+    def get_expression(self):
+        def expression(model):
+            order_columns = []
+            for field, order in self.value.items():
+                column = getattr(model, field)
+                order_columns.append(getattr(column, order)())
+            return order_columns
 
         return expression
 

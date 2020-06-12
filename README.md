@@ -4,7 +4,7 @@ Usage
 -----
 
 `sqlalchemy-filter` can be used for generating interfaces similar to the `django-filter`
-library. For example, if you had a Post model you could have a
+library. For example, if you have a Post model you can create a
 filter for it with the code:
 
 ```python
@@ -20,6 +20,7 @@ class PostFilter(Filter):
     title_ilike = fields.Field(lookup_type="ilike")
     data = fields.JsonField(lookup_type="#>>", lookup_path="{foo,0}", not_equal=True)
     category = fields.Field(relation_model="Category", field_name="name", lookup_type="in")
+    order = fields.OrderField()
 
     class Meta:
         model = models.Post
@@ -31,17 +32,18 @@ And then in your view you could do:
 def post_list(request):
     posts = (
         PostFilter()
-        .filter_query(Post.query.join(Category), {"category": 'Category 1'})
+        .filter_query(Post.query.join(Category), {"category": 'Category 1', 'order': 'title,-id'})
         .all()
     )
     return {"posts": posts}
 
 ```    
 Above code will perform query like:
-```sql
+```postgresql
 SELECT post.id AS post_id, post.title AS post_title, post.pub_date AS post_pub_date, post.is_published AS post_is_published, post.category_id AS post_category_id 
 FROM post JOIN category ON category.id = post.category_id 
-WHERE category.name IN (%(name_1)s)
+WHERE category.name IN ('Category 1')
+ORDER BY post.title ASC, post.id DESC
 ```
 Notes:
     You should validate your filter params by yourself and pass already validated params to filter_query func, 
@@ -99,7 +101,7 @@ Find posts where title != Title 1
 PostFilter().filter_query(models.Post.query, {"not_title": "Title 1"}).all()
 ```
 
-```sql
+```postgresql
 SELECT *
 FROM post 
 WHERE (post.data ->> "title") != "Title 1"
@@ -111,7 +113,7 @@ Find posts where is_published == True
 PostFilter().filter_query(models.Post.query, {"is_published": "true"}).all()
 ```
 
-```sql
+```postgresql
 SELECT *
 FROM post 
 WHERE (post.data ->> "is_published") = "true"
@@ -123,7 +125,7 @@ Find posts where first tag name == IT
 PostFilter().filter_query(models.Post.query, {"tag": 'IT'}).all()
 ```
 
-```sql
+```postgresql
 SELECT *
 FROM post 
 WHERE (post.data #>> "{tags, 0, name}") = "IT"
