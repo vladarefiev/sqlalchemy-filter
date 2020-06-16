@@ -80,6 +80,27 @@ def test_filter_category(database):
     assert result[0].id == post.id
 
 
+@pytest.mark.parametrize("input_data", ["foo,bar", ["foo", "bar"]])
+def test_filter_multiple_category(database, input_data):
+    category_1 = factories.Category.create(name="foo")
+    category_2 = factories.Category.create(name="bar")
+    category_3 = factories.Category.create(name="baz")
+    post_1 = factories.Post.create(title="1", category=category_1)
+    post_2 = factories.Post.create(title="2", category=category_2)
+    factories.Post.create(title="3", category=category_3)
+    result = (
+        PostFilter()
+        .filter_query(
+            models.Post.query.join(models.Category).order_by("id"),
+            {"category": input_data},
+        )
+        .all()
+    )
+    assert len(result) == 2
+    assert result[0].id == post_1.id
+    assert result[1].id == post_2.id
+
+
 @pytest.mark.parametrize(
     "lookup_type, lookup_path, param, not_equal, expected_id",
     [
