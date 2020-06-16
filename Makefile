@@ -9,7 +9,7 @@ fmt:
 verify:
 	docker-compose up -d
 	docker-compose run tests black --check --diff .
-	docker-compose run tests pytest -vv --cov-report html --cov=sqlalchemy_filter tests/
+	docker-compose run tests pytest -s -vv --cov-report html --cov=sqlalchemy_filter tests/
 	docker-compose down
 
 build:

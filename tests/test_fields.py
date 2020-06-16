@@ -135,3 +135,9 @@ def test_order_field(input_data, expected):
     field = fields.OrderField()
     field.value = input_data
     assert field.value == expected
+
+
+def test_order_field_exception():
+    field = fields.OrderField()
+    with pytest.raises(exceptions.FieldException):
+        field.value = 0
