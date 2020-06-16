@@ -138,7 +138,8 @@ def test_order_field(input_data, expected):
     assert field.value == expected
 
 
-def test_order_field_exception():
+@pytest.mark.parametrize("input_data", [0, {"foo": "bar"}, [1, "2", 3]])
+def test_order_field_exception(input_data):
     field = fields.OrderField()
     with pytest.raises(exceptions.FieldException):
-        field.value = 0
+        field.value = input_data
