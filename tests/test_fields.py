@@ -129,6 +129,7 @@ def test_datetime_field(input_data, date_format, expected, error_class):
         ("-foo,bar", {"foo": "desc", "bar": "asc"}),
         ("foo, bar", {"foo": "asc", "bar": "asc"}),
         ("-foo,-bar", {"foo": "desc", "bar": "desc"}),
+        (["-foo", "-bar"], {"foo": "desc", "bar": "desc"}),
     ],
 )
 def test_order_field(input_data, expected):

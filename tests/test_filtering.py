@@ -154,11 +154,12 @@ def test_filter_jsonb(
     assert result[0].id == expected_id
 
 
-def test_ordering(database):
+@pytest.mark.parametrize("order", ["title,-id", ["title", "-id"]])
+def test_ordering(database, order):
     factories.Post.create(id=1, title="Title 1")
     factories.Post.create(id=2, title="Title 1")
     factories.Post.create(id=3, title="Title 3")
-    result = PostFilter().filter_query(models.Post.query, {"order": "title,-id"})
+    result = PostFilter().filter_query(models.Post.query, {"order": order})
     assert result[0].id == 2
     assert result[1].id == 1
     assert result[2].id == 3

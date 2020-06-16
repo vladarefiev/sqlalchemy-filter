@@ -165,12 +165,20 @@ class OrderField(IField):
         return self._value
 
     @staticmethod
-    def validate(value: str, *args, **kwargs) -> List[str]:
-        if not isinstance(value, str):
+    def validate(value: Union[str, List[str]], *args, **kwargs) -> List[str]:
+        if not isinstance(value, (str, list)):
             raise sqlalchemy_filter.exceptions.FieldException(
-                "OrderField expects str value"
+                "OrderField expects str or List[str] value"
             )
-        return [i.strip() for i in value.split(",")]
+        if isinstance(value, str):
+            return [v.strip() for v in value.split(",")]
+        if isinstance(value, list):
+            for v in value:
+                if not isinstance(v, str):
+                    raise sqlalchemy_filter.exceptions.FieldException(
+                        "OrderField expects str or List[str] value"
+                    )
+            return [v.strip() for v in value]
 
     @value.setter
     def value(self, value: str):
