@@ -61,9 +61,10 @@ class Field(IField):
     @value.setter
     def value(self, value: str) -> None:
         self._value = self.validate(value)
-        self._value = (
-            value.split(",") if self.lookup_type in ["in", "not_in"] else value
-        )
+        if self.lookup_type in ["in", "not_in"] and isinstance(value, str):
+            value: List[str] = [v.strip() for v in value.split(",")]
+
+        self._value = value
 
     @staticmethod
     def validate(value, *args, **kwargs):
